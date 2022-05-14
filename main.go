@@ -21,6 +21,7 @@ const envFile = ".env"
 const dataFile = "data/forms.json"
 
 var loadEnv = env.Load
+var templates = template.Must(template.ParseGlob("templates/*"))
 
 type formInput struct {
 	FirstName   string `json:"first_name"`
@@ -155,6 +156,15 @@ func run() (s *http.Server) {
 	return
 }
 
+func renderTemplate(resp http.ResponseWriter, templateName string, data interface{}) {
+	err := templates.ExecuteTemplate(resp, templateName, data)
+	if err != nil {
+		resp.WriteHeader(http.StatusNotFound)
+		_, _ = fmt.Fprint(resp, err.Error())
+		return
+	}
+}
+
 func main() {
 	s := run()
 	quit := make(chan os.Signal)
@@ -170,14 +180,4 @@ func main() {
 		log.Fatal("Server forced to shutdown")
 	}
 	log.Println("Server exiting")
-}
-
-func renderTemplate(resp http.ResponseWriter, templateName string, data interface{}) {
-	parsedTemplate, _ := template.ParseFiles(templateName)
-	err := parsedTemplate.Execute(resp, data)
-	if err != nil {
-		resp.WriteHeader(http.StatusNotFound)
-		_, _ = fmt.Fprint(resp, err.Error())
-		return
-	}
 }
