@@ -1,25 +1,23 @@
 # Golang Engineering Assignment
 
-This is a hands-on coding exercise.
+## Instructions:
 
-The Golang project contained in this folder has some issues that prevent it from
-functioning properly.
+- Run the application: `go run main.go`
+- Run all the tests: `go test .`
 
-In addition to the issues, the application is not feature-complete.
+## Endpoints
 
-## Objectives
+After running the application at http://localhost:8080 we will have access to the following endpoints:
 
-1. Fix all bugs
-1. Implement the missing feature outlined in **Application Specs** below
+1. `/`
+    * Get: will display a form to enter the data of a specific person  
+      ![display output](screenshots/main-page.png "Display Output")
+    * Post: after clicking at submit but the entered data will be saved locally under `./data/forms.json`
+2. `/data`
+    * Get: will display all persons data at a table  
+      ![display output](screenshots/data.png "Display Output")
 
-## Application Specs
+### Note
 
-Our objective is to build a simple survey form that allows users to save data
-as well as view previously-entered data.
-
-1. Users should be able to enter data into [form.html](./form.html)
-1. Upon submitting the form, data should be saved into [forms.json](./data/forms.json)
-1. **TODO:** Users should be able to access a webpage that prints all data contained in [forms.json](./data/forms.json)
-  (example screenshot provided below)
-   
-![display output](screenshot-output.png "Display Output")
+The application by default will run at port 8080, to change the port number create environment variable with the   
+preferred port num or edit it at the `.env` file
