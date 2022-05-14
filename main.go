@@ -61,7 +61,7 @@ func handleFunc(resp http.ResponseWriter, req *http.Request) {
 		err := req.ParseForm()
 		if err != nil {
 			resp.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(resp, err.Error())
+			_, _ = fmt.Fprint(resp, err.Error())
 			return
 		}
 		f := formInput{
@@ -74,24 +74,24 @@ func handleFunc(resp http.ResponseWriter, req *http.Request) {
 		err = f.validate()
 		if err != nil {
 			resp.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(resp, err.Error())
+			_, _ = fmt.Fprint(resp, err.Error())
 			return
 		}
 		err = f.save()
 		if err != nil {
 			resp.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(resp, err.Error())
+			_, _ = fmt.Fprint(resp, err.Error())
 			return
 		}
 		resp.WriteHeader(http.StatusOK)
-		fmt.Fprint(resp, "form saved")
+		_, _ = fmt.Fprint(resp, "form saved")
 	case http.MethodGet:
 		resp.WriteHeader(http.StatusOK)
 		renderTemplate(resp, "form.html")
 	default:
 		log.Println("error no 404")
 		resp.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(resp, "not found")
+		_, _ = fmt.Fprint(resp, "not found")
 	}
 }
 
@@ -149,11 +149,11 @@ func main() {
 }
 
 func renderTemplate(resp http.ResponseWriter, templateName string) {
-	parsedTemplate, _ := template.ParseFiles("form.html")
+	parsedTemplate, _ := template.ParseFiles(templateName)
 	err := parsedTemplate.Execute(resp, nil)
 	if err != nil {
 		resp.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(resp, err.Error())
+		_, _ = fmt.Fprint(resp, err.Error())
 		return
 	}
 }
