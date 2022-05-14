@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -86,7 +87,7 @@ func handleFunc(resp http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(resp, "form saved")
 	case http.MethodGet:
 		resp.WriteHeader(http.StatusOK)
-		fmt.Fprint(resp, "under construction")
+		renderTemplate(resp, "form.html")
 	default:
 		log.Println("error no 404")
 		resp.WriteHeader(http.StatusNotFound)
@@ -113,6 +114,7 @@ func run() (s *http.Server) {
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
+		Handler:        mux,
 	}
 
 	go func() {
@@ -144,4 +146,14 @@ func main() {
 		log.Fatal("Server forced to shutdown")
 	}
 	log.Println("Server exiting")
+}
+
+func renderTemplate(resp http.ResponseWriter, templateName string) {
+	parsedTemplate, _ := template.ParseFiles("form.html")
+	err := parsedTemplate.Execute(resp, nil)
+	if err != nil {
+		resp.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(resp, err.Error())
+		return
+	}
 }
