@@ -25,10 +25,7 @@ func TestHandleFunc_POST_Success(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fail()
 	}
-	err := ioutil.WriteFile(dataFile, []byte("[]"), os.ModeAppend)
-	if err != nil {
-		return
-	}
+	ioutil.WriteFile(dataFile, []byte("[]"), os.ModeAppend)
 }
 
 func TestHandleFunc_GET_Success(t *testing.T) {
@@ -51,11 +48,8 @@ func TestHandleFunc_GET_NotFound(t *testing.T) {
 
 func TestRun(t *testing.T) {
 	oLoadEnv := loadEnv
-	loadEnv = func(filename string) (err error) {
-		err = os.Setenv("PORT", "8080")
-		if err != nil {
-			return err
-		}
+	loadEnv = func(filename ...string) (err error) {
+		os.Setenv("PORT", "8080")
 		return
 	}
 	defer func() {
@@ -67,8 +61,5 @@ func TestRun(t *testing.T) {
 	}()
 	srv := run()
 	time.Sleep(1 * time.Second)
-	err := srv.Shutdown(context.TODO())
-	if err != nil {
-		return
-	}
+	srv.Shutdown(context.TODO())
 }
