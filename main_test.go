@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func TestHandleFunc_POST_Success(t *testing.T) {
+func TestHandleFormFunc_POST_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	data := url.Values{}
 	data.Set("first_name", "John")
@@ -32,7 +32,7 @@ func TestHandleFunc_POST_Success(t *testing.T) {
 	}
 }
 
-func TestHandleFunc_GET_Success(t *testing.T) {
+func TestHandleFormFunc_GET_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 	handleFormFunc(w, req)
@@ -41,10 +41,46 @@ func TestHandleFunc_GET_Success(t *testing.T) {
 	}
 }
 
-func TestHandleFunc_GET_NotFound(t *testing.T) {
+func TestHandleFormFunc_GET_NotFound(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/", nil)
 	handleFormFunc(w, req)
+	if w.Code != http.StatusNotFound {
+		t.Fail()
+	}
+}
+
+func TestHandleDataFunc_GET_Success(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/data", nil)
+	handleDataFunc(w, req)
+	if w.Code != http.StatusNotFound {
+		t.Fail()
+	}
+}
+
+func TestHandleDataFunc_POST_NotFound(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/data", nil)
+	handleDataFunc(w, req)
+	if w.Code != http.StatusNotFound {
+		t.Fail()
+	}
+}
+
+func TestHandleDataFunc_PUT_NotFound(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, "/data", nil)
+	handleDataFunc(w, req)
+	if w.Code != http.StatusNotFound {
+		t.Fail()
+	}
+}
+
+func TestHandleDataFunc_DELETE_NotFound(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodDelete, "/data", nil)
+	handleDataFunc(w, req)
 	if w.Code != http.StatusNotFound {
 		t.Fail()
 	}
