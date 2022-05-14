@@ -22,7 +22,7 @@ func TestHandleFunc_POST_Success(t *testing.T) {
 	data.Set("phone_number", "0819999999")
 	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	handleFunc(w, req)
+	handleFormFunc(w, req)
 	if w.Code != http.StatusOK {
 		t.Fail()
 	}
@@ -30,13 +30,12 @@ func TestHandleFunc_POST_Success(t *testing.T) {
 	if err != nil {
 		fmt.Printf("Failed to write to the file %s\n%s", dataFile, err.Error())
 	}
-
 }
 
 func TestHandleFunc_GET_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/", nil)
-	handleFunc(w, req)
+	handleFormFunc(w, req)
 	if w.Code != http.StatusOK {
 		t.Fail()
 	}
@@ -45,7 +44,7 @@ func TestHandleFunc_GET_Success(t *testing.T) {
 func TestHandleFunc_GET_NotFound(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPut, "/", nil)
-	handleFunc(w, req)
+	handleFormFunc(w, req)
 	if w.Code != http.StatusNotFound {
 		t.Fail()
 	}
