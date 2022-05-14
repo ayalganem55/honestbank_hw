@@ -36,13 +36,22 @@ func (f formInput) validate() error {
 	return nil
 }
 
-func (f formInput) save() error {
+func getData() ([]formInput, error) {
 	file, err := ioutil.ReadFile(dataFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var forms []formInput
 	err = json.Unmarshal(file, &forms)
+	if err != nil {
+		return nil, err
+	}
+
+	return forms, nil
+}
+
+func (f formInput) save() error {
+	forms, err := getData()
 	if err != nil {
 		return err
 	}
@@ -55,7 +64,7 @@ func (f formInput) save() error {
 	return err
 }
 
-func handleFunc(resp http.ResponseWriter, req *http.Request) {
+func handleFormFunc(resp http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodPost:
 		err := req.ParseForm()
@@ -87,7 +96,25 @@ func handleFunc(resp http.ResponseWriter, req *http.Request) {
 		_, _ = fmt.Fprint(resp, "form saved")
 	case http.MethodGet:
 		resp.WriteHeader(http.StatusOK)
-		renderTemplate(resp, "form.html")
+		renderTemplate(resp, "form.html", nil)
+	default:
+		log.Println("error no 404")
+		resp.WriteHeader(http.StatusNotFound)
+		_, _ = fmt.Fprint(resp, "not found")
+	}
+}
+
+func handleDataFunc(resp http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		forms, err := getData()
+		if err != nil {
+			resp.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		resp.WriteHeader(http.StatusOK)
+		renderTemplate(resp, "table.html", forms)
 	default:
 		log.Println("error no 404")
 		resp.WriteHeader(http.StatusNotFound)
@@ -107,7 +134,8 @@ func run() (s *http.Server) {
 	port = fmt.Sprintf(":%s", port)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handleFunc)
+	mux.HandleFunc("/", handleFormFunc)
+	mux.HandleFunc("/data", handleDataFunc)
 
 	s = &http.Server{
 		Addr:           port,
@@ -148,9 +176,9 @@ func main() {
 	log.Println("Server exiting")
 }
 
-func renderTemplate(resp http.ResponseWriter, templateName string) {
+func renderTemplate(resp http.ResponseWriter, templateName string, data interface{}) {
 	parsedTemplate, _ := template.ParseFiles(templateName)
-	err := parsedTemplate.Execute(resp, nil)
+	err := parsedTemplate.Execute(resp, data)
 	if err != nil {
 		resp.WriteHeader(http.StatusNotFound)
 		_, _ = fmt.Fprint(resp, err.Error())
