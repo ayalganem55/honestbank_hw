@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -25,7 +26,11 @@ func TestHandleFunc_POST_Success(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fail()
 	}
-	ioutil.WriteFile(dataFile, []byte("[]"), os.ModeAppend)
+	err := ioutil.WriteFile(dataFile, []byte("[]"), os.ModeAppend)
+	if err != nil {
+		fmt.Printf("Failed to write to the file %s\n%s", dataFile, err.Error())
+	}
+
 }
 
 func TestHandleFunc_GET_Success(t *testing.T) {
@@ -49,7 +54,10 @@ func TestHandleFunc_GET_NotFound(t *testing.T) {
 func TestRun(t *testing.T) {
 	oLoadEnv := loadEnv
 	loadEnv = func(filename ...string) (err error) {
-		os.Setenv("PORT", "8080")
+		err = os.Setenv("PORT", "8080")
+		if err != nil {
+			fmt.Printf("Failed to set environment vriable PORT\n%s", err.Error())
+		}
 		return
 	}
 	defer func() {
@@ -61,5 +69,8 @@ func TestRun(t *testing.T) {
 	}()
 	srv := run()
 	time.Sleep(1 * time.Second)
-	srv.Shutdown(context.TODO())
+	err := srv.Shutdown(context.TODO())
+	if err != nil {
+		fmt.Printf("Failed to shut down\n%s", err.Error())
+	}
 }
